@@ -1,0 +1,4 @@
+2026-07-29 20:15:51,387 | INFO | deu certo??
+2026-07-29 20:15:51,401 | INFO | Arquivo user_data.csv normalizado e salvo como data/silver/user_data.parquet
+2026-07-29 20:17:15,712 | INFO | Arquivo user_data.csv normalizado e salvo como data/silver/user_data.parquet
+2026-07-29 20:17:42,807 | INFO | Arquivo user_data.csv normalizado e salvo como data/silver/user_data.parquet
