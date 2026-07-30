@@ -1,0 +1,122 @@
+[
+  {
+    "id": 1,
+    "name": "Notebook Dell Inspiron",
+    "category": "Eletrônicos",
+    "price": 4599.90,
+    "stock": 8,
+    "user_id": 1
+  },
+  {
+    "id": 2,
+    "name": "Mouse Logitech G203",
+    "category": "Periféricos",
+    "price": 149.90,
+    "stock": 25,
+    "user_id": 2
+  },
+  {
+    "id": 3,
+    "name": "Teclado Mecânico Redragon",
+    "category": "Periféricos",
+    "price": 289.90,
+    "stock": 15,
+    "user_id": 3
+  },
+  {
+    "id": 4,
+    "name": "Monitor LG 27 Polegadas",
+    "category": "Monitores",
+    "price": 1199.90,
+    "stock": 10,
+    "user_id": 1
+  },
+  {
+    "id": 5,
+    "name": "Cadeira Gamer",
+    "category": "Móveis",
+    "price": 899.90,
+    "stock": 6,
+    "user_id": 5
+  },
+  {
+    "id": 6,
+    "name": "HD Externo 1TB",
+    "category": "Armazenamento",
+    "price": 379.90,
+    "stock": 18,
+    "user_id": 4
+  },
+  {
+    "id": 7,
+    "name": "SSD NVMe 1TB",
+    "category": "Armazenamento",
+    "price": 499.90,
+    "stock": 12,
+    "user_id": 2
+  },
+  {
+    "id": 8,
+    "name": "Webcam Full HD",
+    "category": "Acessórios",
+    "price": 249.90,
+    "stock": 20,
+    "user_id": 6
+  },
+  {
+    "id": 9,
+    "name": "Headset HyperX Cloud",
+    "category": "Áudio",
+    "price": 399.90,
+    "stock": 9,
+    "user_id": 7
+  },
+  {
+    "id": 10,
+    "name": "Dock USB-C",
+    "category": "Acessórios",
+    "price": 199.90,
+    "stock": 14,
+    "user_id": 3
+  },
+  {
+    "id": 11,
+    "name": "Impressora Epson EcoTank",
+    "category": "Impressoras",
+    "price": 1399.90,
+    "stock": 4,
+    "user_id": 8
+  },
+  {
+    "id": 12,
+    "name": "Caixa de Som Bluetooth",
+    "category": "Áudio",
+    "price": 329.90,
+    "stock": 11,
+    "user_id": 10
+  },
+  {
+    "id": 13,
+    "name": "Tablet Samsung Galaxy Tab",
+    "category": "Tablets",
+    "price": 2299.90,
+    "stock": 5,
+    "user_id": 9
+  },
+  {
+    "id": 14,
+    "name": "Smartphone Motorola Edge",
+    "category": "Smartphones",
+    "price": 2799.90,
+    "stock": 7,
+    "user_id": 4
+  },
+  {
+    "id": 15,
+    "name": "Carregador Turbo USB-C",
+    "category": "Acessórios",
+    "price": 89.90,
+    "stock": 30,
+    "user_id": 6
+  }
+]

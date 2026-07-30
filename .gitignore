@@ -1,33 +1,15 @@
-# Virtual environment
+# Ambiente Python
 .venv/
 
-# Python cache
+# Cache Python
 __pycache__/
-*.py[cod]
-*$py.class
 
-# Compiled extensions
-*.so
+# Logs
+*.log
 
-# Distribution / packaging
-build/
-dist/
-*.egg-info/
+# Dados gerados pelo ETL
+data/silver/
+data/gold/
 
-# Test and coverage
-.pytest_cache/
-.coverage
-htmlcov/
-
-# Jupyter
-.ipynb_checkpoints/
-
-# macOS
-.DS_Store
-
-# VS Code
-.vscode/
-
-# Environment variables
-.env
-.env.*
+# Docker volumes
+postgres_data/

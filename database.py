@@ -41,15 +41,3 @@ class Database:
     
     def connection_close(self):
         self.conn.close()
-
-
-if __name__ == "__main__":
-    db = Database(hostname='localhost', port=5432, database='etl_database', user='admin', password='admin')
-
-    df = pd.DataFrame({"id": [1,2,3], "nome": ["joao","maria","pedro"]})
-
-    db.create_table("joao1", df.columns.tolist())
-    db.insert_data("joao1", df)
-
-    print(db.select_from_all("joao1"))
-    db.connection_close()
