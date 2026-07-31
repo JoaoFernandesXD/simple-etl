@@ -1,7 +1,7 @@
 import requests
 import logging
 logging.basicConfig(
-    filename="etl.log",
+    filename="api.log",
     level=logging.INFO,
     format="%(asctime)s | %(levelname)s | %(message)s"
 )
@@ -10,7 +10,7 @@ class ConsultaAPI:
     """
         Classe responsável por consultar informações de CEP através de uma API.
     """
-    def __init__(self, url_base):
+    def __init__(self, url_base="https://viacep.com.br/ws"):
         """
         Inicializa a classe.
 
@@ -35,6 +35,7 @@ class ConsultaAPI:
         try:
             response = requests.get(url_completa, timeout=10)
             response.raise_for_status()
+            logging.info(f"CEP {cep} consultado com sucesso.")
             return response.json()
             
         except requests.exceptions.HTTPError as e:
@@ -50,3 +51,4 @@ class ConsultaAPI:
         except requests.exceptions.RequestException as e:
             logging.error(f"Erro na requisicao para cep {cep}: {e}")
             return None
+
