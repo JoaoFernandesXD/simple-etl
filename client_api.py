@@ -19,7 +19,7 @@ class ConsultaAPI:
         """
         self.url_base = url_base
 
-    def obter_dados(self, cep: int):
+    def obter_dados(self, cep: str):
         """
         Consulta um CEP na API.
 

@@ -1,6 +1,7 @@
 import os
 import pandas as pd 
 import logging
+from client_api import ConsultaAPI
 logging.basicConfig(
     filename="etl.log",
     level=logging.INFO,
@@ -49,7 +50,7 @@ class NormalizeData:
                 except ValueError:
                     df = pd.read_json(input_path, lines=True)
             else:
-                logging.warning(f"Arquivo {file} nao suportado")
+                logging.error(f"Arquivo {file} nao suportado")
                 continue
     
             df = self.convert_columns(df)
@@ -84,3 +85,5 @@ class NormalizeData:
 if __name__ == "__main__":
     normalize_data = NormalizeData(input_dir = 'data/bronze', output_dir = 'data/silver')
     normalize_data.normalize_data()
+    oi = ConsultaAPI()
+    oi.obter_dados('01599999')
