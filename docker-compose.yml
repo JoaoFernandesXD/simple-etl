@@ -5,12 +5,12 @@ services:
     container_name: postgres_etl
 
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
-      POSTGRES_DB: etl_database
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
 
     ports:
-      - "5432:5432"
+      - "${DB_PORT}:5432"
 
     volumes:
       - postgres_data:/var/lib/postgresql/data
