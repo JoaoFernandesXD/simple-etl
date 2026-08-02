@@ -24,6 +24,7 @@ class NormalizeData:
     def __init__(self, input_dir, output_dir):
         self.input_dir = input_dir
         self.output_dir = output_dir
+        self.cep = ConsultaAPI()
         os.makedirs(output_dir, exist_ok=True)
 
     def normalize_data(self) -> None:
@@ -42,8 +43,12 @@ class NormalizeData:
             name, ext = os.path.splitext(file)
             output_path = os.path.join(self.output_dir, f'{name}.parquet')
 
+                
             if ext == '.csv':
+
                 df = pd.read_csv(input_path)
+                if name == "user_data":
+                   self.enriquecer_usuario(df)
             elif ext == '.json':
                 try:
                     df = pd.read_json(input_path)
@@ -52,12 +57,12 @@ class NormalizeData:
             else:
                 logging.error(f"Arquivo {file} nao suportado")
                 continue
-    
+
             df = self.convert_columns(df)
            
             #remove linhas duplicadas
             df = df.drop_duplicates().reset_index(drop=True)
-        
+
             df.to_parquet(output_path, index=False)
         
             logging.info(f"Arquivo {file} normalizado e salvo como {output_path}")
@@ -81,9 +86,16 @@ class NormalizeData:
                 df[col] = df[col].apply(lambda x: str(x) if isinstance(x, list) else x)
         return df
 
+    def enriquecer_usuario(self, df):
+
+        for cep in df["cep"]:
+
+         cep_input = cep.replace("-", "")
+         dados = self.cep.obter_dados(cep_input)
+
+         print(dados)
+
 
 if __name__ == "__main__":
     normalize_data = NormalizeData(input_dir = 'data/bronze', output_dir = 'data/silver')
     normalize_data.normalize_data()
-    oi = ConsultaAPI()
-    oi.obter_dados('01599999')
