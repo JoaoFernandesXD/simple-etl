@@ -2,9 +2,12 @@
 from database import Database
 import os
 import pandas as pd
+from dotenv import load_dotenv
 
 
-db = Database(hostname='localhost', port=5432, database='etl_database', user='admin', password='admin')
+load_dotenv()
+
+db = Database(hostname=os.getenv('DB_HOST'), port=os.getenv('DB_PORT'), database=os.getenv('DB_DATABASE'), user=os.getenv('DB_USER'), password=os.getenv('DB_PASSWORD'))
 
 for file in os.listdir("data/silver"):
 

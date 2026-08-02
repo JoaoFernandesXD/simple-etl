@@ -1,5 +1,6 @@
 # Ambiente Python
 .venv/
+.env
 
 # Cache Python
 __pycache__/
