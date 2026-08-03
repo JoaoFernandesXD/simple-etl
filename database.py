@@ -20,11 +20,21 @@ class Database:
         
 
     def insert_data(self, name_table, df):
+
+        df = df.where(pd.notnull(df), None)
+        
         cursor = self.conn.cursor()
-        for index, row in df.iterrows():
-            valures = tuple(row.values)
-            cursor.execute(f"INSERT INTO {name_table} VALUES {valures}")
+        
+        # Monta os placeholders: (%s, %s, %s, ...)
+        placeholders = ", ".join(["%s"] * len(df.columns))
+        query = f"INSERT INTO {name_table} VALUES ({placeholders})"
+        
+        values = [tuple(row) for row in df.to_numpy()]
+        
+        cursor.executemany(query, values)
+        
         self.conn.commit()
+        cursor.close()
        
 
     def execute_query(self, query):

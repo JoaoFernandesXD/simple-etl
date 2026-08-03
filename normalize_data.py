@@ -45,10 +45,10 @@ class NormalizeData:
 
                 
             if ext == '.csv':
-
                 df = pd.read_csv(input_path)
                 if name == "user_data":
-                   self.enriquecer_usuario(df)
+                   df = self.enriquecer_usuario(df)
+
             elif ext == '.json':
                 try:
                     df = pd.read_json(input_path)
