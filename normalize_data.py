@@ -87,13 +87,55 @@ class NormalizeData:
         return df
 
     def enriquecer_usuario(self, df):
+        """
+            Enriquece o DataFrame de usuários com informações de endereço
+            a partir do CEP, utilizando a API ViaCEP.
+
+            Para cada CEP presente no DataFrame, a função consulta a API
+            e adiciona as seguintes colunas:
+                - cidade
+                - estado
+                - bairro
+                - logradouro
+                - ibge
+
+            Parâmetros
+            ----------
+            df
+                DataFrame contendo pelo menos a coluna 'cep'.
+
+            Retorno
+            -------
+                DataFrame original com as novas colunas de endereço adicionadas.
+                Caso a API não retorne dados para algum CEP, o valor None é atribuído.
+        """
+        df = df.copy()
+
+        resultados = {
+            "cidade": [],
+            "estado": [],
+            "bairro": [],
+            "logradouro": [],
+            "ibge": []
+        }
 
         for cep in df["cep"]:
+            cep_limpo = str(cep).replace("-", "").strip() if pd.notna(cep) else None
 
-         cep_input = cep.replace("-", "")
-         dados = self.cep.obter_dados(cep_input)
+            dados = self.cep.obter_dados(cep_limpo) if cep_limpo else None
 
-         print(dados)
+            resultados["cidade"].append(dados.get("localidade") if dados else None)
+            resultados["estado"].append(dados.get("uf") if dados else None)
+            resultados["bairro"].append(dados.get("bairro") if dados else None)
+            resultados["logradouro"].append(dados.get("logradouro") if dados else None)
+            resultados["ibge"].append(dados.get("ibge") if dados else None)
+
+        for coluna, valores in resultados.items():
+            df[coluna] = valores
+
+        logging.info(f"Enriquecidos {len(df)} usuários com dados do ViaCEP.")
+
+        return df
 
 
 if __name__ == "__main__":
