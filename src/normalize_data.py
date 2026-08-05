@@ -137,7 +137,3 @@ class NormalizeData:
 
         return df
 
-
-#if __name__ == "__main__":
-    #normalize_data = NormalizeData(input_dir = 'data/bronze', output_dir = 'data/silver')
-    #normalize_data.normalize_data()
