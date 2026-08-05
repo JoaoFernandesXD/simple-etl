@@ -1,44 +1,85 @@
 # simple-etl
-simple etl
 
-Projeto de estudo/portfólio de um pipeline **ETL** em Python, construído para demonstrar extração, transformação e carga de dados a partir de múltiplas fontes (arquivo CSV, arquivo JSON e API externa) até um banco de dados relacional.
+Pipeline **ETL** em Python que extrai dados de múltiplas fontes (CSV, JSON e uma API externa), trata e enriquece esses dados, carrega em um banco **PostgreSQL** e gera uma camada analítica com agregações — seguindo a arquitetura **Medalhão (Bronze → Silver → Gold)**.
 
-> ⚠️ Projeto em desenvolvimento. Algumas partes ainda estão sendo implementadas/ajustadas.
+Projeto de estudo/portfólio, construído para demonstrar na prática extração, transformação, carga e modelagem analítica de dados.
 
-## Visão geral
+`Python 3` · `pandas` · `PostgreSQL 16` · `Docker` · `ViaCEP API`
 
-O pipeline segue uma arquitetura inspirada no modelo **Medalhão (Bronze → Silver)**:
 
-1. **Bronze** — dados brutos, como recebidos das fontes originais (`data/bronze`):
-   - `user_data.csv`: cadastro de usuários (nome, idade, profissão, CEP, telefone, e-mail, sexo).
-   - `products.json`: catálogo de produtos associados a usuários.
-2. **Silver** — dados tratados e normalizados (`data/silver`), gerados a partir da camada Bronze:
-   - Remoção de duplicados.
-   - Conversão de colunas incompatíveis com o formato Parquet.
-   - Enriquecimento do cadastro de usuários com dados de endereço (cidade, estado, bairro, logradouro, código IBGE) consultados via [API ViaCEP](https://viacep.com.br/) a partir do CEP de cada usuário.
-3. **Carga** — os arquivos Parquet da camada Silver são lidos e persistidos em um banco **PostgreSQL**, com criação automática das tabelas.
+## Sobre o projeto
 
-## Tecnologias
+O pipeline parte de um cadastro de usuários (CSV) e um catálogo de produtos (JSON), trata e remove dados duplicados, **enriquece o cadastro com dados de endereço consultando a API pública [ViaCEP](https://viacep.com.br/)** a partir do CEP de cada usuário, salva o resultado em Parquet, carrega tudo em um banco relacional e, por fim, calcula métricas de negócio (usuários por estado/cidade, idade média, distribuição por profissão e sexo).
 
-- Python 3
-- [pandas](https://pandas.pydata.org/) — leitura/transformação de dados e escrita em Parquet
-- [requests](https://docs.python-requests.org/) — consumo da API ViaCEP
-- [psycopg2](https://www.psycopg.org/) — conexão com PostgreSQL
-- [python-dotenv](https://github.com/theskumar/python-dotenv) — variáveis de ambiente
-- PostgreSQL via Docker (docker-compose)
+### O que este projeto demonstra
+
+- Modelagem de pipeline de dados em camadas (**Bronze / Silver / Gold**)
+- Consumo de API externa com **retry, backoff e tratamento de erros** por tipo de falha (timeout, HTTP, conexão)
+- Escrita/leitura em **Parquet** e carga em **PostgreSQL**
+- Design orientado a objetos separando responsabilidades (`ConsultaAPI`, `NormalizeData`, `Database`, `GoldLayer`)
+- Ambiente reprodutível com **Docker Compose** e variáveis de ambiente (`.env`)
+- Logging estruturado das execuções (`etl.log`)
+
+## Arquitetura
+
+```mermaid
+flowchart LR
+    subgraph Bronze["🥉 Bronze — data/bronze"]
+        CSV["user_data.csv"]
+        JSON["products.json"]
+    end
+
+    subgraph Transform["NormalizeData"]
+        NORM[["normalize_data()"]]
+    end
+
+    API[("ViaCEP API")]
+
+    subgraph Silver["🥈 Silver — data/silver"]
+        SU["user_data.parquet"]
+        SP["products.parquet"]
+    end
+
+    subgraph Load["Database"]
+        DB[["create_table() + insert_data()"]]
+    end
+
+    PG[("PostgreSQL")]
+
+    subgraph GoldStage["🥇 GoldLayer"]
+        GL[["groupby() x5"]]
+    end
+
+    GOUT[("data/gold/*.parquet")]
+
+    CSV --> NORM
+    JSON --> NORM
+    NORM <-- "GET /ws/{cep}/json" --> API
+    NORM -- "to_parquet()" --> SU
+    NORM -- "to_parquet()" --> SP
+    SU -- "todos os arquivos" --> DB
+    SP -- "todos os arquivos" --> DB
+    DB --> PG
+    SU -. "lido direto do disco, sem passar pelo Postgres" .-> GL
+    GL --> GOUT
+```
+
 
 ## Estrutura do projeto
 
 ```
 simple-etl/
 ├── data/
-│   ├── bronze/          # dados brutos (CSV, JSON)
-│   └── silver/          # dados tratados (Parquet)
-├── client_api.py        # cliente de consulta à API ViaCEP
-├── normalize_data.py    # normalização e enriquecimento (Bronze -> Silver)
-├── database.py          # camada de acesso ao PostgreSQL (criação de tabelas e insert)
-├── main.py               # carga dos arquivos Silver para o PostgreSQL
-├── docker-compose.yml    # sobe o PostgreSQL usado no projeto
+│   ├── bronze/              # dados brutos (CSV, JSON)
+│   ├── silver/              # dados tratados e enriquecidos (Parquet)
+│   └── gold/                # agregações analíticas (Parquet)
+├── src/
+│   ├── client_api.py        # cliente da API ViaCEP (retry, backoff, logging)
+│   ├── normalize_data.py    # normalização e enriquecimento (Bronze -> Silver)
+│   ├── database.py          # acesso ao PostgreSQL (criação de tabelas e insert)
+│   └── gold_layer.py        # agregações analíticas (Silver -> Gold)
+├── main.py                  # orquestra o pipeline completo
+├── docker-compose.yml       # sobe o PostgreSQL usado no projeto
 ├── requirements.txt
 └── .env.example
 ```
@@ -50,11 +91,18 @@ simple-etl/
 - Docker e Docker Compose
 
 ### 2. Configurar variáveis de ambiente
-Copie o arquivo de exemplo e preencha com suas credenciais:
 
 ```bash
 cp .env.example .env
 ```
+
+| Variável      | Descrição                          |
+|---------------|-------------------------------------|
+| `DB_HOST`     | host do PostgreSQL (`localhost`)   |
+| `DB_PORT`     | porta exposta pelo docker-compose  |
+| `DB_DATABASE` | nome do banco                      |
+| `DB_USER`     | usuário do banco                   |
+| `DB_PASSWORD` | senha do banco                     |
 
 ### 3. Subir o banco de dados
 
@@ -70,20 +118,11 @@ pip install -r requirements.txt
 
 ### 5. Rodar o pipeline
 
-```bash
-# Bronze -> Silver (normalização e enriquecimento via API)
-python normalize_data.py
+Um único comando executa o fluxo completo — Bronze → Silver (com enriquecimento via ViaCEP) → carga no PostgreSQL → agregações Gold:
 
-# Silver -> PostgreSQL (carga no banco)
+```bash
 python main.py
 ```
-
-## Status / próximos passos
-
-- [ ] Testes automatizados
-- [ ] Tratamento de erros mais robusto na camada de carga
-- [ ] Camada Gold (agregações/modelagem para consumo)
-- [ ] Orquestração do pipeline (ex.: um único comando/script de execução)
 
 ## Autor
 
