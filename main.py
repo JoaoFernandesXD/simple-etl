@@ -1,5 +1,6 @@
 from src.database import Database
 from src.normalize_data import NormalizeData
+from src.gold_layer import GoldLayer
 import pandas as pd 
 import os
 from dotenv import load_dotenv
@@ -25,6 +26,15 @@ def main():
 
     transforme_dados()
     carregamento_banco(db)
+    gold = GoldLayer()
+    df = gold.carregamento_usuarios()
+    estado = gold.users_by_state(df)
+    cidade = gold.users_by_city(df)
+    idade = gold.mean_users_state(df)
+    profissao = gold.job_users_count(df)
+    sexo = gold.sex_users(df)
+
+
 
 
 if __name__ == "__main__":
