@@ -3,15 +3,39 @@ import os
 
 
 class GoldLayer:
+    """Camada Gold do pipeline de ETL.
+
+    Responsavel por consumir os dados tratados da camada Silver e gerar
+    agregacoes basicas prontas para consumo (dashboards, relatorios,
+    etc). Cada metodo de agregacao persiste seu resultado em um arquivo
+    parquet dentro do diretorio 'data/gold'.
+    """
+
     def __init__(self):
+        """Inicializa a camada Gold garantindo que o diretorio de saida exista."""
         os.makedirs("data/gold", exist_ok=True)
 
     def carregamento_usuarios(self):
+        """Carrega os dados de usuarios da camada Silver.
+
+        Returns:
+            pd.DataFrame: DataFrame com os dados de usuarios lidos do
+            arquivo 'data/silver/user_data.parquet'.
+        """
         file_user = "data/silver/user_data.parquet"
         return pd.read_parquet(file_user)
 
     def users_by_state(self, df):
-        # quantos usuarios temos por estado?
+        """Calcula a quantidade de usuarios agrupados por estado.
+
+        Args:
+            df: DataFrame de usuarios contendo a coluna 'estado'.
+
+        Returns:
+            pd.DataFrame: DataFrame com as colunas 'estado' e
+            'quantidade_usuarios'. Tambem salvo em
+            'data/gold/users_by_state.parquet'.
+        """
         total_usuario_estado = (
             df.groupby("estado")
             .size()
@@ -21,7 +45,16 @@ class GoldLayer:
         return total_usuario_estado
 
     def users_by_city(self, df):
-        # quantos usuarios existem por cidade?
+        """Calcula a quantidade de usuarios agrupados por cidade.
+
+        Args:
+            df (pd.DataFrame): DataFrame de usuarios contendo a coluna 'cidade'.
+
+        Returns:
+            pd.DataFrame: DataFrame com as colunas 'cidade' e
+            'total_usuario_cidade'. Tambem salvo em
+            'data/gold/users_by_city.parquet'.
+        """
         total_usuario_cidade = (
             df.groupby("cidade")
             .size()
@@ -31,7 +64,17 @@ class GoldLayer:
         return total_usuario_cidade
 
     def mean_users_state(self, df):
-        # qual é a idade media de nossos clientes por estado?
+        """Calcula a idade media dos usuarios agrupados por estado.
+
+        Args:
+            df (pd.DataFrame): DataFrame de usuarios contendo as colunas
+                'estado' e 'idade'.
+
+        Returns:
+            pd: DataFrame com as colunas 'estado' e
+            'idade_media_cliente_estado'. Tambem salvo em
+            'data/gold/mean_users_state.parquet'.
+        """
         idade_media_cliente_estado = (
             df.groupby("estado")["idade"]
             .mean()
@@ -41,7 +84,16 @@ class GoldLayer:
         return idade_media_cliente_estado
 
     def job_users_count(self, df):
-        # quantidade de usuarios por profissao
+        """Calcula a quantidade de usuarios agrupados por profissao.
+
+        Args:
+            df: DataFrame de usuarios contendo a coluna 'profissao'.
+
+        Returns:
+            pd.DataFrame: DataFrame com as colunas 'profissao' e
+            'usuario_profissao'. Tambem salvo em
+            'data/gold/job_users_count.parquet'.
+        """
         usuario_profissao = (
             df.groupby("profissao")
             .size()
@@ -51,7 +103,16 @@ class GoldLayer:
         return usuario_profissao
 
     def sex_users(self, df):
-        # distribuicao por sexo
+        """Calcula a distribuicao de usuarios agrupados por sexo.
+
+        Args:
+            df (pd.DataFrame): DataFrame de usuarios contendo a coluna 'sexo'.
+
+        Returns:
+            pd.DataFrame: DataFrame com as colunas 'sexo' e
+            'distribuicao_sexo'. Tambem salvo em
+            'data/gold/sex_users.parquet'.
+        """
         distribuicao_sexo = (
             df.groupby("sexo")
             .size()
@@ -59,4 +120,3 @@ class GoldLayer:
         )
         distribuicao_sexo.to_parquet("data/gold/sex_users.parquet")
         return distribuicao_sexo
-
