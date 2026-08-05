@@ -1,7 +1,7 @@
 import os
 import pandas as pd 
 import logging
-from client_api import ConsultaAPI
+from src.client_api import ConsultaAPI
 logging.basicConfig(
     filename="etl.log",
     level=logging.INFO,
@@ -138,6 +138,6 @@ class NormalizeData:
         return df
 
 
-if __name__ == "__main__":
-    normalize_data = NormalizeData(input_dir = 'data/bronze', output_dir = 'data/silver')
-    normalize_data.normalize_data()
+#if __name__ == "__main__":
+    #normalize_data = NormalizeData(input_dir = 'data/bronze', output_dir = 'data/silver')
+    #normalize_data.normalize_data()
