@@ -3,7 +3,7 @@ from requests.adapters import HTTPAdapter
 from urllib3.util import Retry
 import logging
 logging.basicConfig(
-    filename="api.log",
+    filename="etl.log",
     level=logging.INFO,
     format="%(asctime)s | %(levelname)s | %(message)s"
 )
