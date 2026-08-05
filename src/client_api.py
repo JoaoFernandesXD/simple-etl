@@ -1,4 +1,6 @@
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util import Retry
 import logging
 logging.basicConfig(
     filename="api.log",
@@ -18,6 +20,16 @@ class ConsultaAPI:
             url_base (str): URL base da API (ex.: https://viacep.com.br/ws)
         """
         self.url_base = url_base
+        self.session = requests.session()
+        tentativas_retry = Retry(
+            total =3,
+            backoff_factor = 3,
+            status_forcelist = [500, 502, 503, 504],
+            allowed_methods = ["GET", "POST"]
+        )
+        adaptador = HTTPAdapter(max_retries=tentativas_retry)
+        self.session.mount("https://", adaptador)
+        self.session.mount("http://", adaptador)
 
     def obter_dados(self, cep: str):
         """
@@ -33,7 +45,7 @@ class ConsultaAPI:
         """
         url_completa = f"{self.url_base}/{cep}/json/"
         try:
-            response = requests.get(url_completa, timeout=10)
+            response = self.session.get(url_completa, timeout=10)
             response.raise_for_status()
             logging.info(f"CEP {cep} consultado com sucesso.")
             return response.json()
